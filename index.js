@@ -1,41 +1,39 @@
-const express = require("express");
-const cors = require("cors");
-const Groq = require("groq-sdk");
+const express = require('express');
+const Groq = require('groq-sdk');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
+const groqApiKey = process.env.GROQ_API_KEY; // Use environment variable for API key
 
-const groq = new Groq({ apiKey: "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" });
+const groq = new Groq({ apiKey: groqApiKey });
 
-app.use(cors()); // Enable CORS
+app.get('/llama3', async (req, res) => {
+    const prompt = req.query.prompt;
+    if (!prompt) {
+        return res.status(400).send('Prompt query parameter is required');
+    }
 
-app.get('/llama', async (req, res) => {
-  const prompt = req.query.prompt;
-
-  if (!prompt) {
-    return res.status(400).json({ error: 'Prompt parameter is required' });
-  }
-
-  try {
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      model: "llama3-8b-8192",
-    });
-
-    return res.json({
-      response: chatCompletion.choices[0]?.message?.content || ""
-    });
-  } catch (err) {
-    const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
-    return res.status(500).json({ error: `An error occurred: ${errorMessage}` });
-  }
+    try {
+        const chatCompletion = await getGroqChatCompletion(prompt);
+        res.json({ response: chatCompletion.choices[0]?.message?.content || '' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error generating response from Groq API');
+    }
 });
 
+async function getGroqChatCompletion(prompt) {
+    return groq.chat.completions.create({
+        messages: [
+            {
+                role: 'user',
+                content: prompt,
+            },
+        ],
+        model: 'llama3-8b-8192',
+    });
+}
+
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
