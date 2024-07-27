@@ -1,5 +1,5 @@
 {
-  "name": "Hassan",
+  "name": "Node-54",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,6 @@
   "dependencies": {
     "express": "^4.17.1",
     "cors": "^2.8.5",
-    "groq-sdk": "^1.0.0" // Update this to the correct version if necessary
+    "groq-sdk": "^1.0.0"
   }
 }
